@@ -1,12 +1,41 @@
 #!/usr/bin/env node
 
 const { Sonos, SpotifyRegion } = require('sonos');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-const SONOS_IP = '192.168.5.22';
+const DEFAULT_SONOS_IP = '192.168.5.22';
 const DEFAULT_PLAYLIST = '37i9dQZEVXcNbkRhyotquq';
+const CONFIG_FILE = path.join(__dirname, 'sonos-config.json');
 
 const command = process.argv[2];
 const arg = process.argv[3];
+
+function loadConfig() {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+      return config.ip || DEFAULT_SONOS_IP;
+    }
+  } catch (error) {
+    console.warn('⚠️  Could not read config file, using default IP');
+  }
+  return DEFAULT_SONOS_IP;
+}
+
+function saveConfig(ip) {
+  try {
+    const config = { ip };
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    return true;
+  } catch (error) {
+    console.error(`❌ Could not save config: ${error.message}`);
+    return false;
+  }
+}
+
+const SONOS_IP = loadConfig();
 
 function parseSpotifyUrl(input) {
   // Handle full URLs
@@ -24,6 +53,37 @@ function parseSpotifyUrl(input) {
 }
 
 async function executeSonosCommand() {
+  // Handle config commands that don't need Sonos connection
+  if (command === 'set-ip') {
+    if (!arg) {
+      console.log('❌ Please provide an IP address');
+      console.log('Usage: sonos set-ip <ip-address>');
+      process.exit(1);
+    }
+    // Basic IP validation
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(arg)) {
+      console.log('❌ Invalid IP address format');
+      console.log('Example: sonos set-ip 192.168.1.100');
+      process.exit(1);
+    }
+    if (saveConfig(arg)) {
+      console.log(`✅ Sonos IP saved: ${arg}`);
+      console.log(`📁 Config file: ${CONFIG_FILE}`);
+    }
+    return;
+  }
+
+  if (command === 'get-ip') {
+    console.log(`🏠 Current Sonos IP: ${SONOS_IP}`);
+    if (fs.existsSync(CONFIG_FILE)) {
+      console.log(`   (from config: ${CONFIG_FILE})`);
+    } else {
+      console.log('   (using default IP - no config file)');
+    }
+    return;
+  }
+
   const sonos = new Sonos(SONOS_IP);
   sonos.setSpotifyRegion(SpotifyRegion.EU);
 
@@ -101,18 +161,31 @@ async function executeSonosCommand() {
       case 'help':
         console.log(`
 Sonos CLI Commands:
+
+Configuration:
+  sonos set-ip <ip>       - Set Sonos IP address
+  sonos get-ip            - Show current Sonos IP address
+
+Playback Control:
   sonos play              - Resume playback
   sonos pause             - Pause playback
-  sonos vol-up            - Increase volume by 1
-  sonos vol-down          - Decrease volume by 1
-  sonos <spotify-url/id>  - Play playlist or track (accepts full URL or just ID)
   sonos next              - Skip to next track
   sonos current           - Show currently playing track
   sonos default           - Start default playlist
+  
+Volume Control:
+  sonos vol-up            - Increase volume by 1
+  sonos vol-down          - Decrease volume by 1
+
+Spotify:
+  sonos <spotify-url/id>  - Play playlist or track (accepts full URL or just ID)
   sonos queue <url/id>    - Add track to queue
+  
+Other:
   sonos help              - Show this help message
 
 Examples:
+  sonos set-ip 192.168.1.100
   sonos https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M
   sonos https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT
   sonos queue https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT
