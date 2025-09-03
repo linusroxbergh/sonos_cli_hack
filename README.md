@@ -2,6 +2,22 @@
 
 Simple CLI tool hack to control sonos speaker
 
+## Commands
+
+```bash
+sonos play              # Resume playback
+sonos pause             # Pause playback
+sonos default           # Start default playlist
+sonos <url or id>       # Play any Spotify playlist or track
+sonos next              # Skip to next track
+sonos current           # Show currently playing track
+sonos queue <url/id>    # Add track to queue
+sonos vol-up            # Increase volume by 1
+sonos vol-down          # Decrease volume by 1
+```
+
+## Setup
+
 ### 1. Find your Sonos IP address
 - Open the Sonos app on your phone or desktop
 - Go to Settings → System → About My System
@@ -19,19 +35,6 @@ npm link
 
 Boom! Now you can use `sonos` commands from anywhere.
 
-## Commands
-
-```bash
-sonos play              # Resume playback
-sonos pause             # Pause playback
-sonos default           # Start default playlist
-sonos <url or id>       # Play any Spotify playlist or track
-sonos next              # Skip to next track
-sonos current           # Show currently playing track
-sonos queue <url/id>    # Add track to queue
-sonos vol-up            # Increase volume by 1
-sonos vol-down          # Decrease volume by 1
-```
 
 ## Playing Spotify Content
 
