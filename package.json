@@ -1,0 +1,14 @@
+{
+  "name": "sonos-cli",
+  "version": "1.0.0",
+  "description": "Simple Sonos CLI controller",
+  "main": "sonos.js",
+  "bin": {
+    "sonos": "./sonos.js"
+  },
+  "dependencies": {
+    "sonos": "^1.14.1"
+  },
+  "author": "",
+  "license": "MIT"
+}
