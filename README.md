@@ -7,31 +7,31 @@ Simple CLI tool hack to control sonos speaker
 ```bash
 sonos play              # Resume playback
 sonos pause             # Pause playback
+sonos vol-up            # Increase volume by 1
+sonos vol-down          # Decrease volume by 1
 sonos default           # Start default playlist
 sonos <url or id>       # Play any Spotify playlist or track
 sonos next              # Skip to next track
-sonos current           # Show currently playing track
 sonos queue <url/id>    # Add track to queue
-sonos vol-up            # Increase volume by 1
-sonos vol-down          # Decrease volume by 1
+sonos current           # Show currently playing track
+sonos set-ip <ip>       # Set your Sonos IP address
+sonos get-ip            # Show current IP address
 ```
 
 ## Setup
 
-### 1. Find your Sonos IP address
-- Open the Sonos app on your phone or desktop
-- Go to Settings → System → About My System
-- Note your speaker's IP address
-- Update line 5 in `sonos.js` with your IP:
-  ```javascript
-  const SONOS_IP = '192.168.5.22'; // <- Your IP here
-  ```
-
-### 2. Install
+### 1. Install
 ```bash
 npm install
 npm link
 ```
+
+### 2. Set your Sonos IP address
+```bash
+sonos set-ip 192.168.1.100  # Replace with your Sonos IP
+```
+
+To find your Sonos IP: Open the Sonos app → Settings → System → About My System
 
 Boom! Now you can use `sonos` commands from anywhere.
 
